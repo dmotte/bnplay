@@ -1,5 +1,5 @@
 # BNPlay
 
-![](bnplay-icon.png)
+![](bnplay-icon-128.png)
 
 Brown Noise player
