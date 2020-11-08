@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -12,6 +13,11 @@
             font-family: sans-serif;
         }
         
+        body {
+            background-color: #222;
+            color: #ccc;
+        }
+        
         a :link {
             color: #00c;
         }
@@ -19,18 +25,135 @@
         a :visited {
             color: #00c;
         }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .btn-ctrl {
+            background-color: #000;
+            color: #ccc;
+            border: 1px solid #888;
+            padding: 20px 30px;
+            font-weight: bold;
+        }
     </style>
 
     <script type="text/javascript">
-        /*TODO*/
+        var bnp_interval;
+        var bnp_switchMillis = 30 * 1000;
+
+        function bnp_switchPlayer() {
+            player1 = document.getElementById("player1");
+            player2 = document.getElementById("player2");
+
+            if (player1.paused && !player2.paused) {
+                // Player 2 is playing. Switch to player 1
+                player1.play();
+                player2.pause();
+                player2.currentTime = 0;
+            } else if (!player1.paused && player2.paused) {
+                // Player 1 is playing. Switch to player 2
+                player2.play();
+                player1.pause();
+                player1.currentTime = 0;
+            } else if (player1.paused && player2.paused) {
+                // No player is playing. Start one player
+                player1.currentTime = 0;
+                player1.play();
+            } else if (!player1.paused && !player2.paused) {
+                // Both players are playing (this should never happen). Leave
+                // only player 1 playing
+                player2.pause();
+                player2.currentTime = 0;
+            }
+        }
+
+        function bnp_isPlaying() {
+            return !(player1.paused && player2.paused);
+        }
+
+        function bnp_play() {
+            if (bnp_isPlaying())
+                return;
+
+            player1 = document.getElementById("player1");
+            player2 = document.getElementById("player2");
+
+            player2.currentTime = 0;
+            player1.play();
+
+            bnp_interval = setInterval(bnp_switchPlayer, bnp_switchMillis);
+        }
+
+        function bnp_stop() {
+            if (!bnp_isPlaying())
+                return;
+
+            player1 = document.getElementById("player1");
+            player2 = document.getElementById("player2");
+
+            clearInterval(bnp_interval);
+
+            player1.pause();
+            player2.pause();
+            player1.currentTime = 0;
+            player2.currentTime = 0;
+        }
+
+        function bnp_toggle() {
+            if (bnp_isPlaying())
+                bnp_stop();
+            else
+                bnp_play();
+        }
     </script>
+
+    <script type="text/javascript">
+        function ui_update() {
+            btnToggle = document.getElementById("btnToggle");
+            divStatus = document.getElementById("divStatus");
+
+            if (bnp_isPlaying()) {
+                divStatus.innerHTML = "Playing...";
+                btnToggle.value = "STOP";
+            } else {
+                divStatus.innerHTML = "Stopped.";
+                btnToggle.value = "PLAY";
+            }
+        }
+
+        function ui_toggle() {
+            bnp_toggle();
+            ui_update();
+        }
+    </script>
+
+    <script type="text/javascript">
+        window.onload = function() {
+            ui_update();
+        };
+    </script>
+
 </head>
 
 <body>
-    <audio controls loop class="TODO">
+    <audio hidden id="player1">
         <source src="https://media.githubusercontent.com/media/dmotte/bnplay/main/bn-sample.flac">
         Your browser does not support the HTML5 audio element
     </audio>
+    <audio hidden id="player2">
+        <source src="https://media.githubusercontent.com/media/dmotte/bnplay/main/bn-sample.flac">
+        Your browser does not support the HTML5 audio element
+    </audio>
+
+    <div class="text-center">
+        <h1>Brown noise</h1>
+
+        <div id="divStatus">Please wait...</div>
+        <br/>
+        <input type="button" id="btnToggle" value="Loading..." class="btn-ctrl" onclick="ui_toggle()" />
+    </div>
 </body>
 
 </html>
