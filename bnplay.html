@@ -70,6 +70,9 @@
         }
 
         function bnp_isPlaying() {
+            player1 = document.getElementById("player1");
+            player2 = document.getElementById("player2");
+
             return !(player1.paused && player2.paused);
         }
 
