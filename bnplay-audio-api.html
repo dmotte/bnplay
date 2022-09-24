@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BNPlay - Audio API version</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+
+    <style type="text/css">
+        body,
+        td,
+        th {
+            font-family: sans-serif;
+        }
+        
+        body {
+            background-color: #222;
+            color: #ccc;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .btn-ctrl {
+            background-color: #000;
+            color: #ccc;
+            border: 1px solid #888;
+            padding: 20px 30px;
+            font-weight: bold;
+        }
+        
+        .btn-ctrl:disabled {
+            color: #c60;
+            border: 1px solid #f80;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var bnp_audioCtx = new AudioContext();
+        var bnp_audioData;
+        var bnp_source = null;
+
+        function bnp_load() {
+            // This URL has CORS enabled
+            return fetch("https://media.githubusercontent.com/media/dmotte/bnplay/main/bn-sample.flac")
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error("HTTP error " + response.status);
+                    return response.arrayBuffer();
+                })
+                .then(buffer => bnp_audioCtx.decodeAudioData(buffer))
+                .then(audioData => {
+                    bnp_audioData = audioData
+                });
+        }
+
+        function bnp_isPlaying() {
+            return bnp_source !== null;
+        }
+
+        function bnp_play() {
+            if (bnp_isPlaying())
+                return;
+
+            bnp_source = new AudioBufferSourceNode(bnp_audioCtx);
+            bnp_source.buffer = bnp_audioData;
+            bnp_source.connect(bnp_audioCtx.destination);
+            bnp_source.loop = true;
+            bnp_source.start(0);
+        }
+
+        function bnp_stop() {
+            if (!bnp_isPlaying())
+                return;
+
+            bnp_source.stop();
+            bnp_source = null;
+        }
+
+        function bnp_toggle() {
+            if (bnp_isPlaying())
+                bnp_stop();
+            else
+                bnp_play();
+        }
+    </script>
+
+    <script type="text/javascript">
+        function ui_load() {
+            btnToggle = document.getElementById("btnToggle");
+
+            return bnp_load().then(() => {
+                btnToggle.removeAttribute("disabled");
+                ui_update();
+            });
+        }
+
+        function ui_update() {
+            btnToggle = document.getElementById("btnToggle");
+            divStatus = document.getElementById("divStatus");
+
+            if (bnp_isPlaying()) {
+                divStatus.innerHTML = "Playing...";
+                btnToggle.value = "STOP";
+            } else {
+                divStatus.innerHTML = "Stopped.";
+                btnToggle.value = "PLAY";
+            }
+        }
+
+        function ui_toggle() {
+            bnp_toggle();
+            ui_update();
+        }
+    </script>
+</head>
+
+<body onload="ui_load()">
+    <div class="text-center">
+        <h1>Brown noise</h1>
+
+        <p><i>Audio API version</i></p>
+        <br/>
+        <div id="divStatus">Please wait...</div>
+        <br/>
+        <input type="button" id="btnToggle" value="Loading..." class="btn-ctrl" onclick="ui_toggle()" disabled="disabled" />
+    </div>
+</body>
+
+</html>

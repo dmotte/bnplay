@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>BNPlay</title>
+    <title>BNPlay - audio tag version</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
 
@@ -18,14 +18,6 @@
             color: #ccc;
         }
         
-        a :link {
-            color: #00c;
-        }
-        
-        a :visited {
-            color: #00c;
-        }
-        
         .text-center {
             text-align: center;
         }
@@ -36,6 +28,11 @@
             border: 1px solid #888;
             padding: 20px 30px;
             font-weight: bold;
+        }
+        
+        .btn-ctrl:disabled {
+            color: #c60;
+            border: 1px solid #f80;
         }
     </style>
 
@@ -113,6 +110,13 @@
     </script>
 
     <script type="text/javascript">
+        function ui_load() {
+            btnToggle = document.getElementById("btnToggle");
+
+            btnToggle.removeAttribute("disabled");
+            ui_update();
+        }
+
         function ui_update() {
             btnToggle = document.getElementById("btnToggle");
             divStatus = document.getElementById("divStatus");
@@ -131,16 +135,9 @@
             ui_update();
         }
     </script>
-
-    <script type="text/javascript">
-        window.onload = function() {
-            ui_update();
-        };
-    </script>
-
 </head>
 
-<body>
+<body onload="ui_load()">
     <audio hidden id="player1">
         <source src="https://media.githubusercontent.com/media/dmotte/bnplay/main/bn-sample.flac">
         Your browser does not support the HTML5 audio element
@@ -153,9 +150,11 @@
     <div class="text-center">
         <h1>Brown noise</h1>
 
+        <p><i>Audio tag version</i></p>
+        <br/>
         <div id="divStatus">Please wait...</div>
         <br/>
-        <input type="button" id="btnToggle" value="Loading..." class="btn-ctrl" onclick="ui_toggle()" />
+        <input type="button" id="btnToggle" value="Loading..." class="btn-ctrl" onclick="ui_toggle()" disabled="disabled" />
     </div>
 </body>
 

@@ -6,7 +6,10 @@ Brown Noise player
 
 ## Web version
 
-Follow [this link](https://dmotte.github.io/bnplay/bnplay.html) to play brown noise within your web browser.
+Follow one of these links to play brown noise within your web browser. If one doesn't work, try the other.
+
+- :speaker: [**Audio tag version**](https://dmotte.github.io/bnplay/bnplay-audio-tag.html): this uses the [HTML `<audio>` tag](https://www.w3schools.com/tags/tag_audio.asp)
+- :speaker: [**Audio API version**](https://dmotte.github.io/bnplay/bnplay-audio-api.html): this uses the [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 
 ## Desktop version
 
