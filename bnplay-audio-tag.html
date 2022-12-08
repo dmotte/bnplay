@@ -137,7 +137,7 @@
     </script>
 </head>
 
-<body onload="ui_load()">
+<body onload="ui_load()" onkeypress="if (event.key == ' ') btnToggle.click();">
     <audio hidden id="player1">
         <source src="https://dmotte.github.io/bnplay/bn-sample.flac">
         Your browser does not support the HTML5 audio element
@@ -154,7 +154,7 @@
         <br/>
         <div id="divStatus">Please wait...</div>
         <br/>
-        <input type="button" id="btnToggle" value="Loading..." class="btn-ctrl" onclick="ui_toggle()" disabled="disabled" />
+        <input type="button" id="btnToggle" value="Loading..." class="btn-ctrl" onfocus="this.blur()" onclick="ui_toggle()" disabled="disabled" />
     </div>
 </body>
 

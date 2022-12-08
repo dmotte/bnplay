@@ -51,7 +51,7 @@
                 })
                 .then(buffer => bnp_audioCtx.decodeAudioData(buffer))
                 .then(audioData => {
-                    bnp_audioData = audioData
+                    bnp_audioData = audioData;
                 });
         }
 
@@ -116,7 +116,7 @@
     </script>
 </head>
 
-<body onload="ui_load()">
+<body onload="ui_load()" onkeypress="if (event.key == ' ') btnToggle.click();">
     <div class="text-center">
         <h1>Brown noise</h1>
 
@@ -124,7 +124,7 @@
         <br/>
         <div id="divStatus">Please wait...</div>
         <br/>
-        <input type="button" id="btnToggle" value="Loading..." class="btn-ctrl" onclick="ui_toggle()" disabled="disabled" />
+        <input type="button" id="btnToggle" value="Loading..." class="btn-ctrl" onfocus="this.blur()" onclick="ui_toggle()" disabled="disabled" />
     </div>
 </body>
 

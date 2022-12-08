@@ -20,7 +20,7 @@ If you prefer to listen to brown noise locally, i made two **shell scripts**. Th
    ```cmd
    choco install -y ffmpeg
    ```
-3. If you would like to use _Git Bash_ &rarr; execute the :page_facing_up: [`bnplay.sh`](bnplay.sh) script. If you would like to use _cmd.exe_ &rarr; execute the :page_facing_up: [`bnplay.cmd`](bnplay.cmd) script
+3. If you would like to use _Git Bash_ &rarr; execute the [`bnplay.sh`](bnplay.sh) script. If you would like to use _cmd.exe_ &rarr; execute the [`bnplay.cmd`](bnplay.cmd) script
 4. If you want to minimize the application in the **Windows tray bar** while it is running, you can do it by installing **RBTray**:
    ```cmd
    choco install -y rbtray
