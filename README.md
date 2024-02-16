@@ -1,4 +1,4 @@
-# BNPlay
+# bnplay
 
 ![icon](icon-128.png)
 
