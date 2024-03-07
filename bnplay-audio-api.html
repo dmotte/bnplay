@@ -40,19 +40,18 @@
       var bnp_audioData;
       var bnp_source = null;
 
-      function bnp_load() {
-        // This URL has CORS enabled
-        return fetch("https://dmotte.github.io/bnplay/bn-sample.flac", {
-          cache: "force-cache", // We assume the audio file never changes
-        })
-          .then((response) => {
-            if (!response.ok) throw new Error("HTTP error " + response.status);
-            return response.arrayBuffer();
-          })
-          .then((buffer) => bnp_audioCtx.decodeAudioData(buffer))
-          .then((audioData) => {
-            bnp_audioData = audioData;
-          });
+      async function bnp_load() {
+        response = await fetch(
+          // This URL has CORS enabled
+          "https://dmotte.github.io/bnplay/bn-sample.flac",
+          { cache: "force-cache" } // We assume the audio file never changes
+        );
+
+        if (!response.ok) throw new Error("HTTP error " + response.status);
+
+        buffer = await response.arrayBuffer();
+
+        bnp_audioData = await bnp_audioCtx.decodeAudioData(buffer);
       }
 
       function bnp_isPlaying() {
