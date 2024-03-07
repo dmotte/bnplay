@@ -85,10 +85,16 @@
       function ui_load() {
         btnToggle = document.getElementById("btnToggle");
 
-        return bnp_load().then(() => {
-          btnToggle.removeAttribute("disabled");
-          ui_update();
-        });
+        return bnp_load()
+          .then(() => {
+            btnToggle.removeAttribute("disabled");
+            ui_update();
+          })
+          .catch((error) => {
+            console.log(error);
+            divStatus.innerHTML = error;
+            btnToggle.value = "ERROR";
+          });
       }
 
       function ui_update() {
