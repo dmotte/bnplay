@@ -93,7 +93,8 @@
         if (!buffer) {
           buffer = await bnp_getSampleFromWeb();
 
-          // We cache the audio file because we assume that it will never change
+          // We cache the audio file indefinitely because we assume that it
+          // will never change
           const transaction = db.transaction(storeName, "readwrite");
           const store = transaction.objectStore(storeName);
           store.put(buffer, itemName);
