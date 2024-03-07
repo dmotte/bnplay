@@ -40,18 +40,72 @@
       var bnp_audioData;
       var bnp_source = null;
 
-      async function bnp_load() {
+      async function bnp_getSampleFromWeb() {
         response = await fetch(
           // This URL has CORS enabled
-          "https://dmotte.github.io/bnplay/bn-sample.flac",
-          { cache: "force-cache" } // We assume the audio file never changes
+          "https://dmotte.github.io/bnplay/bn-sample.flac"
         );
 
         if (!response.ok) throw new Error("HTTP error " + response.status);
 
-        buffer = await response.arrayBuffer();
+        return await response.arrayBuffer();
+      }
 
-        bnp_audioData = await bnp_audioCtx.decodeAudioData(buffer);
+      async function bnp_getSample() {
+        const dbName = "cache",
+          storeName = "files",
+          itemName = "bn-sample.flac";
+
+        const db = await new Promise((resolve, reject) => {
+          const req = indexedDB.open(dbName, 1);
+
+          req.onerror = (event) => {
+            reject(`Error opening IndexedDB database ${dbName}`);
+          };
+
+          req.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(storeName))
+              db.createObjectStore(storeName);
+          };
+
+          req.onsuccess = (event) => {
+            resolve(event.target.result);
+          };
+        });
+
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        buffer = await new Promise((resolve, reject) => {
+          const req = store.get(itemName);
+
+          req.onerror = (event) => {
+            reject(
+              `Error getting item ${itemName} from store ${storeName} from IndexedDB database ${dbName}`
+            );
+          };
+
+          req.onsuccess = (event) => {
+            resolve(event.target.result);
+          };
+        });
+
+        if (!buffer) {
+          buffer = await bnp_getSampleFromWeb();
+
+          // We cache the audio file because we assume that it will never change
+          const transaction = db.transaction(storeName, "readwrite");
+          const store = transaction.objectStore(storeName);
+          store.put(buffer, itemName);
+        }
+
+        return buffer;
+      }
+
+      async function bnp_load() {
+        bnp_audioData = await bnp_audioCtx.decodeAudioData(
+          await bnp_getSample()
+        );
       }
 
       function bnp_isPlaying() {
