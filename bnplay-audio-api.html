@@ -43,7 +43,7 @@
       async function bnp_getSampleFromWeb() {
         response = await fetch(
           // This URL has CORS enabled
-          "https://dmotte.github.io/bnplay/bn-sample.flac"
+          "https://dmotte.github.io/bnplay/bn-sample.flac",
         );
 
         if (!response.ok) throw new Error("HTTP error " + response.status);
@@ -81,7 +81,7 @@
 
           req.onerror = (event) => {
             reject(
-              `Error getting item ${itemName} from store ${storeName} from IndexedDB database ${dbName}`
+              `Error getting item ${itemName} from store ${storeName} from IndexedDB database ${dbName}`,
             );
           };
 
@@ -104,7 +104,7 @@
 
       async function bnp_load() {
         bnp_audioData = await bnp_audioCtx.decodeAudioData(
-          await bnp_getSample()
+          await bnp_getSample(),
         );
       }
 
