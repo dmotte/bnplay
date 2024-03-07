@@ -28,8 +28,7 @@
         padding: 20px 30px;
         font-weight: bold;
       }
-
-      .btn-ctrl:disabled {
+      .btn-ctrl-loading {
         color: #c60;
         border: 1px solid #f80;
       }
@@ -109,6 +108,7 @@
       function ui_load() {
         btnToggle = document.getElementById("btnToggle");
 
+        btnToggle.classList.remove("btn-ctrl-loading");
         btnToggle.removeAttribute("disabled");
         ui_update();
       }
@@ -157,7 +157,7 @@
         type="button"
         id="btnToggle"
         value="Loading..."
-        class="btn-ctrl"
+        class="btn-ctrl btn-ctrl-loading"
         onfocus="this.blur()"
         onclick="ui_toggle()"
         disabled="disabled"

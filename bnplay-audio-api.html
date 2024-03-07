@@ -28,10 +28,13 @@
         padding: 20px 30px;
         font-weight: bold;
       }
-
-      .btn-ctrl:disabled {
+      .btn-ctrl-loading {
         color: #c60;
         border: 1px solid #f80;
+      }
+      .btn-ctrl-error {
+        color: #c00;
+        border: 1px solid #f00;
       }
     </style>
 
@@ -142,11 +145,14 @@
 
         return bnp_load()
           .then(() => {
+            btnToggle.classList.remove("btn-ctrl-loading");
             btnToggle.removeAttribute("disabled");
             ui_update();
           })
           .catch((error) => {
             console.log(error);
+            btnToggle.classList.remove("btn-ctrl-loading");
+            btnToggle.classList.add("btn-ctrl-error");
             divStatus.innerHTML = error;
             btnToggle.value = "ERROR";
           });
@@ -187,7 +193,7 @@
         type="button"
         id="btnToggle"
         value="Loading..."
-        class="btn-ctrl"
+        class="btn-ctrl btn-ctrl-loading"
         onfocus="this.blur()"
         onclick="ui_toggle()"
         disabled="disabled"
