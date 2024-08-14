@@ -154,7 +154,7 @@
             console.log(error);
             btnToggle.classList.remove("btn-ctrl-loading");
             btnToggle.classList.add("btn-ctrl-error");
-            divStatus.innerHTML = error;
+            divStatus.textContent = error;
             btnToggle.value = "ERROR";
           });
       }
@@ -164,10 +164,10 @@
         divStatus = document.getElementById("divStatus");
 
         if (bnp_isPlaying()) {
-          divStatus.innerHTML = "Playing...";
+          divStatus.textContent = "Playing...";
           btnToggle.value = "STOP";
         } else {
-          divStatus.innerHTML = "Stopped.";
+          divStatus.textContent = "Stopped.";
           btnToggle.value = "PLAY";
         }
       }

@@ -119,10 +119,10 @@
         divStatus = document.getElementById("divStatus");
 
         if (bnp_isPlaying()) {
-          divStatus.innerHTML = "Playing...";
+          divStatus.textContent = "Playing...";
           btnToggle.value = "STOP";
         } else {
-          divStatus.innerHTML = "Stopped.";
+          divStatus.textContent = "Stopped.";
           btnToggle.value = "PLAY";
         }
       }
