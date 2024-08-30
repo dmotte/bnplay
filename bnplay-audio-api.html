@@ -40,147 +40,153 @@
     </style>
 
     <script type="text/javascript">
-      var bnp_audioCtx = new AudioContext();
-      var bnp_audioData;
-      var bnp_source = null;
+      // Brown Noise Player
+      class BNP {
+        static audioCtx = new AudioContext();
+        static audioData;
+        static source = null;
 
-      async function bnp_getSampleFromWeb() {
-        response = await fetch(
-          // This URL has CORS enabled
-          "https://dmotte.github.io/bnplay/bn-sample.flac",
-        );
+        static async getSampleFromWeb() {
+          const response = await fetch(
+            // This URL has CORS enabled
+            "https://dmotte.github.io/bnplay/bn-sample.flac",
+          );
 
-        if (!response.ok) throw new Error("HTTP error " + response.status);
+          if (!response.ok) throw new Error("HTTP error " + response.status);
 
-        return await response.arrayBuffer();
-      }
-
-      async function bnp_getSample() {
-        const dbName = "bnplay-cache",
-          storeName = "files",
-          itemName = "bn-sample.flac";
-
-        const db = await new Promise((resolve, reject) => {
-          const req = indexedDB.open(dbName, 1);
-
-          req.onerror = (event) => {
-            reject(`Error opening IndexedDB database ${dbName}`);
-          };
-
-          req.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(storeName))
-              db.createObjectStore(storeName);
-          };
-
-          req.onsuccess = (event) => {
-            resolve(event.target.result);
-          };
-        });
-
-        const transaction = db.transaction(storeName, "readonly");
-        const store = transaction.objectStore(storeName);
-        buffer = await new Promise((resolve, reject) => {
-          const req = store.get(itemName);
-
-          req.onerror = (event) => {
-            reject(
-              `Error getting item ${itemName} from store ${storeName} from IndexedDB database ${dbName}`,
-            );
-          };
-
-          req.onsuccess = (event) => {
-            resolve(event.target.result);
-          };
-        });
-
-        if (!buffer) {
-          buffer = await bnp_getSampleFromWeb();
-
-          // We cache the audio file indefinitely because we assume that it
-          // will never change
-          const transaction = db.transaction(storeName, "readwrite");
-          const store = transaction.objectStore(storeName);
-          store.put(buffer, itemName);
+          return await response.arrayBuffer();
         }
 
-        return buffer;
-      }
+        static async getSample() {
+          const dbName = "bnplay-cache",
+            storeName = "files",
+            itemName = "bn-sample.flac";
 
-      async function bnp_load() {
-        bnp_audioData = await bnp_audioCtx.decodeAudioData(
-          await bnp_getSample(),
-        );
-      }
+          const db = await new Promise((resolve, reject) => {
+            const req = indexedDB.open(dbName, 1);
 
-      function bnp_isPlaying() {
-        return bnp_source !== null;
-      }
+            req.onerror = (event) => {
+              reject(new Error(`Error opening IndexedDB database ${dbName}`));
+            };
 
-      function bnp_play() {
-        if (bnp_isPlaying()) return;
+            req.onupgradeneeded = (event) => {
+              const db = event.target.result;
+              if (!db.objectStoreNames.contains(storeName))
+                db.createObjectStore(storeName);
+            };
 
-        bnp_source = new AudioBufferSourceNode(bnp_audioCtx);
-        bnp_source.buffer = bnp_audioData;
-        bnp_source.connect(bnp_audioCtx.destination);
-        bnp_source.loop = true;
-        bnp_source.start(0);
-      }
-
-      function bnp_stop() {
-        if (!bnp_isPlaying()) return;
-
-        bnp_source.stop();
-        bnp_source = null;
-      }
-
-      function bnp_toggle() {
-        if (bnp_isPlaying()) bnp_stop();
-        else bnp_play();
-      }
-    </script>
-
-    <script type="text/javascript">
-      function ui_load() {
-        btnToggle = document.getElementById("btnToggle");
-
-        return bnp_load()
-          .then(() => {
-            btnToggle.classList.remove("btn-ctrl-loading");
-            btnToggle.removeAttribute("disabled");
-            ui_update();
-          })
-          .catch((error) => {
-            console.log(error);
-            btnToggle.classList.remove("btn-ctrl-loading");
-            btnToggle.classList.add("btn-ctrl-error");
-            divStatus.textContent = error;
-            btnToggle.value = "ERROR";
+            req.onsuccess = (event) => {
+              resolve(event.target.result);
+            };
           });
-      }
 
-      function ui_update() {
-        btnToggle = document.getElementById("btnToggle");
-        divStatus = document.getElementById("divStatus");
+          const transaction = db.transaction(storeName, "readonly");
+          const store = transaction.objectStore(storeName);
+          let buffer = await new Promise((resolve, reject) => {
+            const req = store.get(itemName);
 
-        if (bnp_isPlaying()) {
-          divStatus.textContent = "Playing...";
-          btnToggle.value = "STOP";
-        } else {
-          divStatus.textContent = "Stopped.";
-          btnToggle.value = "PLAY";
+            req.onerror = (event) => {
+              reject(
+                new Error(
+                  `Error getting item ${itemName} from store ${storeName} from IndexedDB database ${dbName}`,
+                ),
+              );
+            };
+
+            req.onsuccess = (event) => {
+              resolve(event.target.result);
+            };
+          });
+
+          if (!buffer) {
+            buffer = await this.getSampleFromWeb();
+
+            // We cache the audio file indefinitely because we assume that it
+            // will never change
+            const transaction = db.transaction(storeName, "readwrite");
+            const store = transaction.objectStore(storeName);
+            store.put(buffer, itemName);
+          }
+
+          return buffer;
+        }
+
+        static async load() {
+          this.audioData = await this.audioCtx.decodeAudioData(
+            await this.getSample(),
+          );
+        }
+
+        static isPlaying() {
+          return this.source !== null;
+        }
+
+        static play() {
+          if (this.isPlaying()) return;
+
+          this.source = new AudioBufferSourceNode(this.audioCtx);
+          this.source.buffer = this.audioData;
+          this.source.connect(this.audioCtx.destination);
+          this.source.loop = true;
+          this.source.start(0);
+        }
+
+        static stop() {
+          if (!this.isPlaying()) return;
+
+          this.source.stop();
+          this.source = null;
+        }
+
+        static toggle() {
+          if (this.isPlaying()) this.stop();
+          else this.play();
         }
       }
 
-      function ui_toggle() {
-        bnp_toggle();
-        ui_update();
+      class UI {
+        static load() {
+          const btnToggle = document.getElementById("btnToggle"),
+            divStatus = document.getElementById("divStatus");
+
+          return BNP.load()
+            .then(() => {
+              btnToggle.classList.remove("btn-ctrl-loading");
+              btnToggle.removeAttribute("disabled");
+              this.update();
+            })
+            .catch((error) => {
+              console.log(error);
+              btnToggle.classList.remove("btn-ctrl-loading");
+              btnToggle.classList.add("btn-ctrl-error");
+              divStatus.textContent = error;
+              btnToggle.value = "ERROR";
+            });
+        }
+
+        static update() {
+          const btnToggle = document.getElementById("btnToggle"),
+            divStatus = document.getElementById("divStatus");
+
+          if (BNP.isPlaying()) {
+            divStatus.textContent = "Playing...";
+            btnToggle.value = "STOP";
+          } else {
+            divStatus.textContent = "Stopped.";
+            btnToggle.value = "PLAY";
+          }
+        }
+
+        static toggle() {
+          BNP.toggle();
+          this.update();
+        }
       }
     </script>
   </head>
 
   <body
-    onload="ui_load()"
+    onload="UI.load()"
     onkeypress="if (event.key == ' ') btnToggle.click();"
   >
     <div class="text-center">
@@ -196,7 +202,7 @@
         value="Loading..."
         class="btn-ctrl btn-ctrl-loading"
         onfocus="this.blur()"
-        onclick="ui_toggle()"
+        onclick="UI.toggle()"
         disabled="disabled"
       />
     </div>

@@ -36,106 +36,109 @@
     </style>
 
     <script type="text/javascript">
-      const bnp_switchMillis = 30_000;
+      // Brown Noise Player
+      class BNP {
+        static switchMillis = 30_000;
 
-      var bnp_interval;
+        static interval;
 
-      function bnp_switchPlayer() {
-        player1 = document.getElementById("player1");
-        player2 = document.getElementById("player2");
+        static switchPlayer() {
+          const player1 = document.getElementById("player1"),
+            player2 = document.getElementById("player2");
 
-        if (player1.paused && !player2.paused) {
-          // Player 2 is playing. Switch to player 1
-          player1.play();
-          player2.pause();
+          if (player1.paused && !player2.paused) {
+            // Player 2 is playing. Switch to player 1
+            player1.play();
+            player2.pause();
+            player2.currentTime = 0;
+          } else if (!player1.paused && player2.paused) {
+            // Player 1 is playing. Switch to player 2
+            player2.play();
+            player1.pause();
+            player1.currentTime = 0;
+          } else if (player1.paused && player2.paused) {
+            // No player is playing. Start one player
+            player1.currentTime = 0;
+            player1.play();
+          } else if (!player1.paused && !player2.paused) {
+            // Both players are playing (this should never happen). Leave
+            // only player 1 playing
+            player2.pause();
+            player2.currentTime = 0;
+          }
+        }
+
+        static isPlaying() {
+          const player1 = document.getElementById("player1"),
+            player2 = document.getElementById("player2");
+
+          return !(player1.paused && player2.paused);
+        }
+
+        static play() {
+          if (this.isPlaying()) return;
+
+          const player1 = document.getElementById("player1"),
+            player2 = document.getElementById("player2");
+
           player2.currentTime = 0;
-        } else if (!player1.paused && player2.paused) {
-          // Player 1 is playing. Switch to player 2
-          player2.play();
+          player1.play();
+
+          this.interval = setInterval(this.switchPlayer, this.switchMillis);
+        }
+
+        static stop() {
+          if (!this.isPlaying()) return;
+
+          const player1 = document.getElementById("player1"),
+            player2 = document.getElementById("player2");
+
+          clearInterval(this.interval);
+
           player1.pause();
-          player1.currentTime = 0;
-        } else if (player1.paused && player2.paused) {
-          // No player is playing. Start one player
-          player1.currentTime = 0;
-          player1.play();
-        } else if (!player1.paused && !player2.paused) {
-          // Both players are playing (this should never happen). Leave
-          // only player 1 playing
           player2.pause();
+          player1.currentTime = 0;
           player2.currentTime = 0;
         }
-      }
 
-      function bnp_isPlaying() {
-        player1 = document.getElementById("player1");
-        player2 = document.getElementById("player2");
-
-        return !(player1.paused && player2.paused);
-      }
-
-      function bnp_play() {
-        if (bnp_isPlaying()) return;
-
-        player1 = document.getElementById("player1");
-        player2 = document.getElementById("player2");
-
-        player2.currentTime = 0;
-        player1.play();
-
-        bnp_interval = setInterval(bnp_switchPlayer, bnp_switchMillis);
-      }
-
-      function bnp_stop() {
-        if (!bnp_isPlaying()) return;
-
-        player1 = document.getElementById("player1");
-        player2 = document.getElementById("player2");
-
-        clearInterval(bnp_interval);
-
-        player1.pause();
-        player2.pause();
-        player1.currentTime = 0;
-        player2.currentTime = 0;
-      }
-
-      function bnp_toggle() {
-        if (bnp_isPlaying()) bnp_stop();
-        else bnp_play();
-      }
-    </script>
-
-    <script type="text/javascript">
-      function ui_load() {
-        btnToggle = document.getElementById("btnToggle");
-
-        btnToggle.classList.remove("btn-ctrl-loading");
-        btnToggle.removeAttribute("disabled");
-        ui_update();
-      }
-
-      function ui_update() {
-        btnToggle = document.getElementById("btnToggle");
-        divStatus = document.getElementById("divStatus");
-
-        if (bnp_isPlaying()) {
-          divStatus.textContent = "Playing...";
-          btnToggle.value = "STOP";
-        } else {
-          divStatus.textContent = "Stopped.";
-          btnToggle.value = "PLAY";
+        static toggle() {
+          if (this.isPlaying()) this.stop();
+          else this.play();
         }
       }
 
-      function ui_toggle() {
-        bnp_toggle();
-        ui_update();
+      class UI {
+        static load() {
+          const btnToggle = document.getElementById("btnToggle");
+
+          btnToggle.classList.remove("btn-ctrl-loading");
+          btnToggle.removeAttribute("disabled");
+          this.update();
+        }
+
+        static update() {
+          const btnToggle = document.getElementById("btnToggle"),
+            divStatus = document.getElementById("divStatus");
+
+          if (BNP.isPlaying()) {
+            divStatus.textContent = "Playing...";
+            btnToggle.value = "STOP";
+          } else {
+            divStatus.textContent = "Stopped.";
+            btnToggle.value = "PLAY";
+          }
+        }
+
+        static toggle() {
+          BNP.toggle();
+          this.update();
+        }
       }
     </script>
   </head>
 
   <body
-    onload="ui_load()"
+    onload="UI.load()"
     onkeypress="if (event.key == ' ') btnToggle.click();"
   >
     <audio hidden id="player1">
@@ -160,7 +163,7 @@
         value="Loading..."
         class="btn-ctrl btn-ctrl-loading"
         onfocus="this.blur()"
-        onclick="ui_toggle()"
+        onclick="UI.toggle()"
         disabled="disabled"
       />
     </div>
