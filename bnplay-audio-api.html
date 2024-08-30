@@ -111,7 +111,7 @@
           return buffer;
         }
 
-        static async load() {
+        static async initialize() {
           this.audioData = await this.audioCtx.decodeAudioData(
             await this.getSample(),
           );
@@ -149,7 +149,7 @@
           const btnToggle = document.getElementById("btnToggle"),
             divStatus = document.getElementById("divStatus");
 
-          return BNP.load()
+          return BNP.initialize()
             .then(() => {
               btnToggle.classList.remove("btn-ctrl-loading");
               btnToggle.removeAttribute("disabled");
