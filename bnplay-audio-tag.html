@@ -40,49 +40,47 @@
       class BNP {
         static switchMillis = 30_000;
 
+        static player1;
+        static player2;
         static interval;
 
         static switchPlayer() {
-          const player1 = document.getElementById("player1"),
-            player2 = document.getElementById("player2");
-
-          if (player1.paused && !player2.paused) {
+          if (this.player1.paused && !this.player2.paused) {
             // Player 2 is playing. Switch to player 1
-            player1.play();
-            player2.pause();
-            player2.currentTime = 0;
-          } else if (!player1.paused && player2.paused) {
+            this.player1.play();
+            this.player2.pause();
+            this.player2.currentTime = 0;
+          } else if (!this.player1.paused && this.player2.paused) {
             // Player 1 is playing. Switch to player 2
-            player2.play();
-            player1.pause();
-            player1.currentTime = 0;
-          } else if (player1.paused && player2.paused) {
+            this.player2.play();
+            this.player1.pause();
+            this.player1.currentTime = 0;
+          } else if (this.player1.paused && this.player2.paused) {
             // No player is playing. Start one player
-            player1.currentTime = 0;
-            player1.play();
-          } else if (!player1.paused && !player2.paused) {
+            this.player1.currentTime = 0;
+            this.player1.play();
+          } else if (!this.player1.paused && !this.player2.paused) {
             // Both players are playing (this should never happen). Leave
             // only player 1 playing
-            player2.pause();
-            player2.currentTime = 0;
+            this.player2.pause();
+            this.player2.currentTime = 0;
           }
         }
 
-        static isPlaying() {
-          const player1 = document.getElementById("player1"),
-            player2 = document.getElementById("player2");
+        static load(player1, player2) {
+          this.player1 = player1;
+          this.player2 = player2;
+        }
 
-          return !(player1.paused && player2.paused);
+        static isPlaying() {
+          return !(this.player1.paused && this.player2.paused);
         }
 
         static play() {
           if (this.isPlaying()) return;
 
-          const player1 = document.getElementById("player1"),
-            player2 = document.getElementById("player2");
-
-          player2.currentTime = 0;
-          player1.play();
+          this.player2.currentTime = 0;
+          this.player1.play();
 
           this.interval = setInterval(this.switchPlayer, this.switchMillis);
         }
@@ -90,15 +88,12 @@
         static stop() {
           if (!this.isPlaying()) return;
 
-          const player1 = document.getElementById("player1"),
-            player2 = document.getElementById("player2");
-
           clearInterval(this.interval);
 
-          player1.pause();
-          player2.pause();
-          player1.currentTime = 0;
-          player2.currentTime = 0;
+          this.player1.pause();
+          this.player2.pause();
+          this.player1.currentTime = 0;
+          this.player2.currentTime = 0;
         }
 
         static toggle() {
@@ -109,6 +104,11 @@
 
       class UI {
         static load() {
+          BNP.load(
+            document.getElementById("player1"),
+            document.getElementById("player2"),
+          );
+
           const btnToggle = document.getElementById("btnToggle");
 
           btnToggle.classList.remove("btn-ctrl-loading");
