@@ -2,7 +2,7 @@
 
 ![icon](icon-128.png)
 
-Brown Noise player
+**B**rown **N**oise **play**er.
 
 ## Web version
 
@@ -13,7 +13,7 @@ Follow one of these links to play brown noise within your web browser. If one do
 
 ## Desktop version
 
-If you prefer to listen to brown noise locally, i made two **shell scripts**. They have been tested with _Git Bash_ on _Windows 10_, but should also work on other operating systems.
+If you prefer to listen to brown noise locally, I made two **shell scripts**. They have both been tested with _Git Bash_ on _Windows 10_, but should work on other systems too.
 
 1. **Clone** the repository on your computer
 2. Install **ffmpeg** if you do not have it installed. I suggest installing it via the [_Chocolatey_ package manager](https://chocolatey.org/install):
