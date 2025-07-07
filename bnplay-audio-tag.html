@@ -82,7 +82,9 @@
           this.player2.currentTime = 0;
           this.player1.play();
 
-          this.interval = setInterval(this.switchPlayer, this.switchMillis);
+          // We need to specify the handler as string here, otherwise "this"
+          // would be undefined inside the function
+          this.interval = setInterval("BNP.switchPlayer()", this.switchMillis);
         }
 
         static stop() {
