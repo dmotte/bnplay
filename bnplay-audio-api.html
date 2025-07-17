@@ -170,9 +170,11 @@
 
           if (BNP.isPlaying()) {
             divStatus.textContent = "Playing...";
+            document.title = "BNPlay - Playing";
             btnToggle.value = "STOP";
           } else {
             divStatus.textContent = "Stopped.";
+            document.title = "BNPlay - Stopped";
             btnToggle.value = "PLAY";
           }
         }
