@@ -156,7 +156,7 @@
               this.update();
             })
             .catch((error) => {
-              console.log(error);
+              console.error(error);
               btnToggle.classList.remove("btn-ctrl-loading");
               btnToggle.classList.add("btn-ctrl-error");
               divStatus.textContent = error;
