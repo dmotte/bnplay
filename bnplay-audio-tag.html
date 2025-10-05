@@ -42,7 +42,7 @@
 
         static player1;
         static player2;
-        static interval;
+        static timer;
 
         static switchPlayer() {
           if (this.player1.paused && !this.player2.paused) {
@@ -84,16 +84,13 @@
 
           // We need to use an arrow function here, otherwise "this"
           // would be undefined inside the function
-          this.interval = setInterval(
-            () => BNP.switchPlayer(),
-            this.switchMillis,
-          );
+          this.timer = setInterval(() => BNP.switchPlayer(), this.switchMillis);
         }
 
         static stop() {
           if (!this.isPlaying()) return;
 
-          clearInterval(this.interval);
+          clearInterval(this.timer);
 
           this.player1.pause();
           this.player2.pause();
