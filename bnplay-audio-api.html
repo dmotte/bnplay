@@ -171,11 +171,11 @@
           if (BNP.isPlaying()) {
             divStatus.textContent = "Playing...";
             document.title = "BNPlay - Playing";
-            btnToggle.value = "STOP";
+            btnToggle.value = "\u23F9  STOP";
           } else {
             divStatus.textContent = "Stopped.";
             document.title = "BNPlay - Stopped";
-            btnToggle.value = "PLAY";
+            btnToggle.value = "\u25B6  PLAY";
           }
         }
 
@@ -192,9 +192,9 @@
     onkeypress="if (event.key == ' ') btnToggle.click();"
   >
     <div class="text-center">
-      <h1>Brown noise</h1>
+      <h1>&#x1F50A; BNPlay</h1>
 
-      <p><i>Audio API version</i></p>
+      <p>&#x1F3A7; <i>Audio API version</i></p>
       <br />
       <div id="divStatus">Please wait...</div>
       <br />
