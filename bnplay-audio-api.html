@@ -70,9 +70,8 @@
           const db = await new Promise((resolve, reject) => {
             const req = indexedDB.open(dbName, 1);
 
-            req.onerror = (event) => {
+            req.onerror = (event) =>
               reject(new Error(`Error opening IndexedDB database ${dbName}`));
-            };
 
             req.onupgradeneeded = (event) => {
               const db = event.target.result;
@@ -80,9 +79,7 @@
                 db.createObjectStore(storeName);
             };
 
-            req.onsuccess = (event) => {
-              resolve(event.target.result);
-            };
+            req.onsuccess = (event) => resolve(event.target.result);
           });
 
           const transaction = db.transaction(storeName, "readonly");
@@ -90,17 +87,14 @@
           let buffer = await new Promise((resolve, reject) => {
             const req = store.get(itemName);
 
-            req.onerror = (event) => {
+            req.onerror = (event) =>
               reject(
                 new Error(
                   `Error getting item ${itemName} from store ${storeName} from IndexedDB database ${dbName}`,
                 ),
               );
-            };
 
-            req.onsuccess = (event) => {
-              resolve(event.target.result);
-            };
+            req.onsuccess = (event) => resolve(event.target.result);
           });
 
           if (!buffer) {
