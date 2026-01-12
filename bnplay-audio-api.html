@@ -150,12 +150,42 @@
       }
 
       class UI {
+        static setupMediaSession() {
+          if (!("mediaSession" in navigator)) return;
+
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: "BNPlay",
+            artist: "dmotte",
+            album: "BNPlay",
+            artwork: [
+              { src: "icon-128.png", sizes: "128x128", type: "image/png" },
+              { src: "icon-512.png", sizes: "512x512", type: "image/png" },
+            ],
+          });
+
+          navigator.mediaSession.setActionHandler("play", () => {
+            BNP.play();
+            this.update();
+          });
+
+          navigator.mediaSession.setActionHandler("pause", () => {
+            BNP.stop();
+            this.update();
+          });
+
+          navigator.mediaSession.setActionHandler("stop", () => {
+            BNP.stop();
+            this.update();
+          });
+        }
+
         static load() {
           const btnToggle = document.getElementById("btnToggle"),
             divStatus = document.getElementById("divStatus");
 
           return BNP.initialize()
             .then(() => {
+              this.setupMediaSession();
               btnToggle.classList.remove("btn-ctrl-loading");
               btnToggle.removeAttribute("disabled");
               this.update();
@@ -177,10 +207,14 @@
             divStatus.textContent = "Playing...";
             document.title = "BNPlay - Playing";
             btnToggle.value = "\u23F9  STOP";
+            if (navigator.mediaSession)
+              navigator.mediaSession.playbackState = "playing";
           } else {
             divStatus.textContent = "Stopped.";
             document.title = "BNPlay - Stopped";
             btnToggle.value = "\u25B6  PLAY";
+            if (navigator.mediaSession)
+              navigator.mediaSession.playbackState = "paused";
           }
         }
 
