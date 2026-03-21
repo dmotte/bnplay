@@ -111,7 +111,7 @@
         }
       }
 
-      class UI {
+      class App {
         static load() {
           BNP.initialize(
             document.getElementById("player1"),
@@ -149,7 +149,7 @@
   </head>
 
   <body
-    onload="UI.load()"
+    onload="App.load()"
     onkeypress="if (event.key === ' ') btnToggle.click();"
   >
     <audio hidden id="player1">
@@ -174,7 +174,7 @@
         value="Loading..."
         class="btn-ctrl btn-ctrl-loading"
         onfocus="this.blur()"
-        onclick="UI.toggle()"
+        onclick="App.toggle()"
         disabled="disabled"
       />
     </div>

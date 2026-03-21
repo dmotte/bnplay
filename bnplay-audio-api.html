@@ -145,7 +145,7 @@
         }
       }
 
-      class UI {
+      class App {
         static setupMediaSession() {
           if (!("mediaSession" in navigator)) return;
 
@@ -223,7 +223,7 @@
   </head>
 
   <body
-    onload="UI.load()"
+    onload="App.load()"
     onkeypress="if (event.key === ' ') btnToggle.click();"
   >
     <div class="text-center">
@@ -239,7 +239,7 @@
         value="Loading..."
         class="btn-ctrl btn-ctrl-loading"
         onfocus="this.blur()"
-        onclick="UI.toggle()"
+        onclick="App.toggle()"
         disabled="disabled"
       />
     </div>
