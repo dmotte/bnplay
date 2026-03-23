@@ -12,17 +12,24 @@
     <style type="text/css">
       :root {
         color-scheme: light dark;
+
+        --btn-bg: #eee;
+        --btn-text: #000;
+        --btn-border: #888;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --btn-bg: #000;
+          --btn-text: #ccc;
+          --btn-border: #888;
+        }
       }
 
       body,
       td,
       th {
         font-family: sans-serif;
-      }
-
-      body {
-        background-color: #222;
-        color: #ccc;
       }
 
       .text-center {
@@ -35,9 +42,9 @@
       }
 
       .btn-ctrl {
-        background-color: #000;
-        color: #ccc;
-        border: 1px solid #888;
+        background-color: var(--btn-bg);
+        color: var(--btn-text);
+        border: 1px solid var(--btn-border);
         padding: 20px 30px;
         font-weight: bold;
       }
