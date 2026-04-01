@@ -32,6 +32,11 @@
         font-family: sans-serif;
       }
 
+      #dialogMsg::backdrop {
+        background-color: #1118;
+        backdrop-filter: blur(3px);
+      }
+
       .text-center {
         text-align: center;
       }
@@ -48,10 +53,6 @@
         padding: 20px 30px;
         font-weight: bold;
       }
-      .btn-ctrl-loading {
-        color: #c60;
-        border: 1px solid #f80;
-      }
     </style>
 
     <script type="text/javascript">
@@ -64,26 +65,30 @@
         static timer;
 
         static switchPlayer() {
+          let result = null;
+
           if (this.player1.paused && !this.player2.paused) {
             // Player 2 is playing. Switch to player 1
-            this.player1.play();
+            result = this.player1.play();
             this.player2.pause();
             this.player2.currentTime = 0;
           } else if (!this.player1.paused && this.player2.paused) {
             // Player 1 is playing. Switch to player 2
-            this.player2.play();
+            result = this.player2.play();
             this.player1.pause();
             this.player1.currentTime = 0;
           } else if (this.player1.paused && this.player2.paused) {
             // No player is playing. Start one player
             this.player1.currentTime = 0;
-            this.player1.play();
+            result = this.player1.play();
           } else if (!this.player1.paused && !this.player2.paused) {
             // Both players are playing (this should never happen). Leave
             // only player 1 playing
             this.player2.pause();
             this.player2.currentTime = 0;
           }
+
+          return result;
         }
 
         static initialize(player1, player2) {
@@ -96,14 +101,19 @@
         }
 
         static play() {
-          if (this.isPlaying()) return;
+          if (this.isPlaying()) return null;
 
           this.player2.currentTime = 0;
-          this.player1.play();
+          const result = this.player1.play();
 
           // We need to use an arrow function here, otherwise "this"
           // would be undefined inside the function
-          this.timer = setInterval(() => BNP.switchPlayer(), this.switchMillis);
+          this.timer = setInterval(
+            () => this.switchPlayer(),
+            this.switchMillis,
+          );
+
+          return result;
         }
 
         static stop() {
@@ -118,24 +128,24 @@
         }
 
         static toggle() {
-          if (this.isPlaying()) this.stop();
-          else this.play();
+          return this.isPlaying() ? this.stop() : this.play();
         }
       }
 
       class App {
-        static load() {
-          BNP.initialize(
-            document.getElementById("player1"),
-            document.getElementById("player2"),
-          );
+        static showModalMsg(msg = "") {
+          const dialogMsg = document.getElementById("dialogMsg");
 
-          const btnToggle = document.getElementById("btnToggle");
+          if (msg === "") {
+            dialogMsg.close();
+            return;
+          }
 
-          btnToggle.classList.remove("btn-ctrl-loading");
-          btnToggle.removeAttribute("disabled");
-          this.update();
+          dialogMsg.textContent = msg;
+          dialogMsg.showModal();
         }
+
+        ////////////////////////////////////////////////////////////////////////
 
         static update() {
           const btnToggle = document.getElementById("btnToggle"),
@@ -152,16 +162,43 @@
           }
         }
 
-        static toggle() {
-          BNP.toggle();
+        ////////////////////////////////////////////////////////////////////////
+
+        static body_onload() {
+          window.addEventListener("error", (event) => {
+            this.showModalMsg(`ERROR: ${event.error}`);
+          });
+
+          window.addEventListener("unhandledrejection", (event) => {
+            this.showModalMsg(`ERROR: ${event.reason}`);
+          });
+
+          BNP.initialize(
+            document.getElementById("player1"),
+            document.getElementById("player2"),
+          );
+
           this.update();
+        }
+
+        static btnToggle_onclick() {
+          this.showModalMsg("Toggling playback state...");
+
+          (async () => {
+            const promise = BNP.toggle();
+            if (promise instanceof Promise) await promise;
+
+            this.update();
+
+            this.showModalMsg();
+          })();
         }
       }
     </script>
   </head>
 
   <body
-    onload="App.load()"
+    onload="App.body_onload()"
     onkeydown="if (event.key === ' ') btnToggle.click();"
   >
     <audio hidden id="player1">
@@ -178,17 +215,17 @@
 
       <p>&#x1F3A7; <i>Audio tag version</i></p>
       <br />
-      <div id="divStatus" class="text-minor">Please wait...</div>
+      <div id="divStatus" class="text-minor"></div>
       <br />
       <input
         type="button"
         id="btnToggle"
-        value="Loading..."
-        class="btn-ctrl btn-ctrl-loading"
+        class="btn-ctrl"
         onfocus="this.blur()"
-        onclick="App.toggle()"
-        disabled="disabled"
+        onclick="App.btnToggle_onclick()"
       />
     </div>
+
+    <dialog id="dialogMsg" closedby="none"></dialog>
   </body>
 </html>

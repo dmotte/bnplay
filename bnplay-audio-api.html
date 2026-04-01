@@ -32,6 +32,11 @@
         font-family: sans-serif;
       }
 
+      #dialogMsg::backdrop {
+        background-color: #1118;
+        backdrop-filter: blur(3px);
+      }
+
       .text-center {
         text-align: center;
       }
@@ -47,14 +52,6 @@
         border: 1px solid var(--btn-border);
         padding: 20px 30px;
         font-weight: bold;
-      }
-      .btn-ctrl-loading {
-        color: #c60;
-        border: 1px solid #f80;
-      }
-      .btn-ctrl-error {
-        color: #c00;
-        border: 1px solid #f00;
       }
     </style>
 
@@ -158,54 +155,19 @@
       }
 
       class App {
-        static setupMediaSession() {
-          if (!("mediaSession" in navigator)) return;
+        static showModalMsg(msg = "") {
+          const dialogMsg = document.getElementById("dialogMsg");
 
-          navigator.mediaSession.metadata = new MediaMetadata({
-            title: "BNPlay",
-            artist: "dmotte",
-            album: "BNPlay",
-            artwork: [
-              { src: "icon-128.png", sizes: "128x128", type: "image/png" },
-              { src: "icon-512.png", sizes: "512x512", type: "image/png" },
-            ],
-          });
+          if (msg === "") {
+            dialogMsg.close();
+            return;
+          }
 
-          navigator.mediaSession.setActionHandler("play", () => {
-            BNP.play();
-            this.update();
-          });
-
-          navigator.mediaSession.setActionHandler("pause", () => {
-            BNP.stop();
-            this.update();
-          });
-
-          navigator.mediaSession.setActionHandler("stop", () => {
-            BNP.stop();
-            this.update();
-          });
+          dialogMsg.textContent = msg;
+          dialogMsg.showModal();
         }
 
-        static load() {
-          const btnToggle = document.getElementById("btnToggle"),
-            divStatus = document.getElementById("divStatus");
-
-          return BNP.initialize()
-            .then(() => {
-              this.setupMediaSession();
-              btnToggle.classList.remove("btn-ctrl-loading");
-              btnToggle.removeAttribute("disabled");
-              this.update();
-            })
-            .catch((error) => {
-              console.error(error);
-              btnToggle.classList.remove("btn-ctrl-loading");
-              btnToggle.classList.add("btn-ctrl-error");
-              divStatus.textContent = error;
-              btnToggle.value = "ERROR";
-            });
-        }
+        ////////////////////////////////////////////////////////////////////////
 
         static update() {
           const btnToggle = document.getElementById("btnToggle"),
@@ -226,7 +188,64 @@
           }
         }
 
-        static toggle() {
+        ////////////////////////////////////////////////////////////////////////
+
+        static body_onload() {
+          window.addEventListener("error", (event) => {
+            this.showModalMsg(`ERROR: ${event.error}`);
+          });
+
+          window.addEventListener("unhandledrejection", (event) => {
+            this.showModalMsg(`ERROR: ${event.reason}`);
+          });
+
+          this.showModalMsg("Initializing...");
+
+          (async () => {
+            await BNP.initialize();
+
+            this.update();
+
+            if ("mediaSession" in navigator) {
+              navigator.mediaSession.metadata = new MediaMetadata({
+                title: "BNPlay",
+                artist: "dmotte",
+                album: "BNPlay",
+                artwork: [
+                  {
+                    src: "icon-128.png",
+                    sizes: "128x128",
+                    type: "image/png",
+                  },
+                  {
+                    src: "icon-512.png",
+                    sizes: "512x512",
+                    type: "image/png",
+                  },
+                ],
+              });
+
+              navigator.mediaSession.setActionHandler("play", () => {
+                BNP.play();
+                this.update();
+              });
+
+              navigator.mediaSession.setActionHandler("pause", () => {
+                BNP.stop();
+                this.update();
+              });
+
+              navigator.mediaSession.setActionHandler("stop", () => {
+                BNP.stop();
+                this.update();
+              });
+            }
+
+            this.showModalMsg();
+          })();
+        }
+
+        static btnToggle_onclick() {
           BNP.toggle();
           this.update();
         }
@@ -235,7 +254,7 @@
   </head>
 
   <body
-    onload="App.load()"
+    onload="App.body_onload()"
     onkeydown="if (event.key === ' ') btnToggle.click();"
   >
     <div class="text-center">
@@ -243,17 +262,17 @@
 
       <p>&#x1F3A7; <i>Audio API version</i></p>
       <br />
-      <div id="divStatus" class="text-minor">Please wait...</div>
+      <div id="divStatus" class="text-minor"></div>
       <br />
       <input
         type="button"
         id="btnToggle"
-        value="Loading..."
-        class="btn-ctrl btn-ctrl-loading"
+        class="btn-ctrl"
         onfocus="this.blur()"
-        onclick="App.toggle()"
-        disabled="disabled"
+        onclick="App.btnToggle_onclick()"
       />
     </div>
+
+    <dialog id="dialogMsg" closedby="none"></dialog>
   </body>
 </html>
