@@ -245,6 +245,15 @@
           })();
         }
 
+        static body_onkeydown(event) {
+          const btnToggle = document.getElementById("btnToggle"),
+            dialogMsg = document.getElementById("dialogMsg");
+
+          if (dialogMsg.open) return;
+
+          if (event.key === " ") btnToggle.click();
+        }
+
         static btnToggle_onclick() {
           BNP.toggle();
           this.update();
@@ -253,10 +262,7 @@
     </script>
   </head>
 
-  <body
-    onload="App.body_onload()"
-    onkeydown="if (event.key === ' ') btnToggle.click();"
-  >
+  <body onload="App.body_onload()" onkeydown="App.body_onkeydown(event)">
     <div class="text-center">
       <h1>&#x1F50A; BNPlay</h1>
 

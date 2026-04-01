@@ -181,6 +181,15 @@
           this.update();
         }
 
+        static body_onkeydown(event) {
+          const btnToggle = document.getElementById("btnToggle"),
+            dialogMsg = document.getElementById("dialogMsg");
+
+          if (dialogMsg.open) return;
+
+          if (event.key === " ") btnToggle.click();
+        }
+
         static btnToggle_onclick() {
           this.showModalMsg("Toggling playback state...");
 
@@ -197,10 +206,7 @@
     </script>
   </head>
 
-  <body
-    onload="App.body_onload()"
-    onkeydown="if (event.key === ' ') btnToggle.click();"
-  >
+  <body onload="App.body_onload()" onkeydown="App.body_onkeydown(event)">
     <audio hidden id="player1">
       <source src="https://dmotte.github.io/bnplay/bn-sample.flac" />
       Your browser does not support the HTML5 audio element
