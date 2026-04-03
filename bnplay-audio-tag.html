@@ -86,6 +86,7 @@
             // only player 1 playing
             this.player2.pause();
             this.player2.currentTime = 0;
+            result = Promise.resolve();
           }
 
           return result;
@@ -101,7 +102,7 @@
         }
 
         static play() {
-          if (this.isPlaying()) return null;
+          if (this.isPlaying()) return Promise.resolve();
 
           this.player2.currentTime = 0;
           const result = this.player1.play();
@@ -128,7 +129,10 @@
         }
 
         static toggle() {
-          return this.isPlaying() ? this.stop() : this.play();
+          if (this.isPlaying()) {
+            this.stop();
+            return Promise.resolve();
+          } else return this.play();
         }
       }
 
@@ -194,9 +198,7 @@
           this.showModalMsg("Toggling playback state...");
 
           (async () => {
-            const promise = BNP.toggle();
-            if (promise instanceof Promise) await promise;
-
+            await BNP.toggle();
             this.update();
 
             this.showModalMsg();
