@@ -226,16 +226,25 @@
               });
 
               navigator.mediaSession.setActionHandler("play", () => {
+                const dialogMsg = document.getElementById("dialogMsg");
+                if (dialogMsg.open) return;
+
                 BNP.play();
                 this.update();
               });
 
               navigator.mediaSession.setActionHandler("pause", () => {
+                const dialogMsg = document.getElementById("dialogMsg");
+                if (dialogMsg.open) return;
+
                 BNP.stop();
                 this.update();
               });
 
               navigator.mediaSession.setActionHandler("stop", () => {
+                const dialogMsg = document.getElementById("dialogMsg");
+                if (dialogMsg.open) return;
+
                 BNP.stop();
                 this.update();
               });
