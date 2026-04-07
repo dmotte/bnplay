@@ -55,7 +55,7 @@
       }
     </style>
 
-    <script type="text/javascript">
+    <script type="module">
       // Brown Noise Player
       class BNP {
         static audioCtx = new AudioContext();
@@ -268,6 +268,8 @@
           this.update();
         }
       }
+
+      window.App = App;
     </script>
   </head>
 
