@@ -199,6 +199,10 @@
             this.showModalMsg(`ERROR: ${event.reason}`);
           });
 
+          // Show the page body only when loaded, to prevent
+          // the user from interacting early
+          document.body.hidden = false;
+
           this.showModalMsg("Initializing...");
 
           (async () => {
@@ -273,7 +277,7 @@
     </script>
   </head>
 
-  <body onload="App.body_onload()" onkeydown="App.body_onkeydown(event)">
+  <body hidden onload="App.body_onload()" onkeydown="App.body_onkeydown(event)">
     <div class="text-center">
       <h1>&#x1F50A; BNPlay</h1>
 

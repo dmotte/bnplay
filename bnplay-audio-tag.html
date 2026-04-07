@@ -182,6 +182,10 @@
             document.getElementById("player2"),
           );
 
+          // Show the page body only when loaded, to prevent
+          // the user from interacting early
+          document.body.hidden = false;
+
           this.update();
         }
 
@@ -210,7 +214,7 @@
     </script>
   </head>
 
-  <body onload="App.body_onload()" onkeydown="App.body_onkeydown(event)">
+  <body hidden onload="App.body_onload()" onkeydown="App.body_onkeydown(event)">
     <audio hidden id="player1">
       <source src="https://dmotte.github.io/bnplay/bn-sample.flac" />
       Your browser does not support the HTML5 audio element
