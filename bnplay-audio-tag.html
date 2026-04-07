@@ -177,14 +177,14 @@
             this.showModalMsg(`ERROR: ${event.reason}`);
           });
 
+          // Show the page body only when loaded, to prevent
+          // the user from interacting early
+          document.body.hidden = false;
+
           BNP.initialize(
             document.getElementById("player1"),
             document.getElementById("player2"),
           );
-
-          // Show the page body only when loaded, to prevent
-          // the user from interacting early
-          document.body.hidden = false;
 
           this.update();
         }
