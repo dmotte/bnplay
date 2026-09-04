@@ -58,69 +58,89 @@
     <script type="module">
       /** Brown Noise Player */
       class BNP {
-        static switchMillis = 30_000;
-
         static player1;
         static player2;
+        static switchSeconds = 60;
+
         static timer;
+        static timerMillis = 10_000;
+
+        ////////////////////////////////////////////////////////////////////////
+
+        /** Returns players by status (active/inactive) */
+        static getPlayers() {
+          const scenario12 = { active: this.player1, inactive: this.player2 },
+            scenario21 = { active: this.player2, inactive: this.player1 };
+
+          if (this.player1.paused && !this.player2.paused) return scenario21;
+
+          if (!this.player1.paused && this.player2.paused) return scenario12;
+
+          if (this.player1.paused && this.player2.paused)
+            return this.player2.currentTime < this.player1.currentTime
+              ? scenario21
+              : scenario12;
+
+          throw new Error("Both players are playing");
+        }
 
         static switchPlayer() {
-          let result = null;
+          const { active, inactive } = this.getPlayers();
 
-          if (this.player1.paused && !this.player2.paused) {
-            // Player 2 is playing. Switch to player 1
-            result = this.player1.play();
-            this.player2.pause();
-            this.player2.currentTime = 0;
-          } else if (!this.player1.paused && this.player2.paused) {
-            // Player 1 is playing. Switch to player 2
-            result = this.player2.play();
-            this.player1.pause();
-            this.player1.currentTime = 0;
-          } else if (this.player1.paused && this.player2.paused) {
-            // No player is playing. Start one player
-            this.player1.currentTime = 0;
-            result = this.player1.play();
-          } else if (!this.player1.paused && !this.player2.paused) {
-            // Both players are playing (this should never happen). Leave
-            // only player 1 playing
-            this.player2.pause();
-            this.player2.currentTime = 0;
-            result = Promise.resolve();
+          if (active.paused) {
+            active.currentTime = 0;
+            inactive.currentTime = 0;
+            return Promise.resolve();
           }
 
+          let result = inactive.play();
+          active.pause();
+          active.currentTime = 0;
           return result;
         }
 
-        static initialize(player1, player2) {
+        static initialize(player1, player2, callbackUpdate) {
           this.player1 = player1;
           this.player2 = player2;
+
+          for (const player of [player1, player2]) {
+            player.addEventListener("ended", callbackUpdate);
+            player.addEventListener("play", callbackUpdate);
+            player.addEventListener("pause", callbackUpdate);
+          }
+
+          // We need to use an arrow function here, otherwise "this"
+          // would be undefined inside the function
+          this.timer = setInterval(() => {
+            const { active, inactive } = this.getPlayers();
+
+            console.info("Players state before timer run: %o", {
+              active,
+              activeT: active.currentTime,
+              inactiveT: inactive.currentTime,
+            });
+
+            if (active.currentTime >= this.switchSeconds)
+              return this.switchPlayer();
+          }, this.timerMillis);
         }
 
+        ////////////////////////////////////////////////////////////////////////
+
         static isPlaying() {
-          return !(this.player1.paused && this.player2.paused);
+          return !this.getPlayers().active.paused;
         }
 
         static play() {
           if (this.isPlaying()) return Promise.resolve();
 
+          this.player1.currentTime = 0;
           this.player2.currentTime = 0;
-          const result = this.player1.play();
-
-          // We need to use an arrow function here, otherwise "this"
-          // would be undefined inside the function
-          this.timer = setInterval(
-            () => this.switchPlayer(),
-            this.switchMillis,
-          );
-
-          return result;
+          return this.player1.play();
         }
 
         static stop() {
           if (!this.isPlaying()) return;
-
-          clearInterval(this.timer);
 
           this.player1.pause();
           this.player2.pause();
@@ -184,6 +204,7 @@
           BNP.initialize(
             document.getElementById("player1"),
             document.getElementById("player2"),
+            this.update,
           );
 
           this.update();
@@ -203,7 +224,6 @@
 
           (async () => {
             await BNP.toggle();
-            this.update();
 
             this.showModalMsg();
           })();
