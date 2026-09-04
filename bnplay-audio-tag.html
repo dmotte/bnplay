@@ -109,6 +109,8 @@
             player.addEventListener("pause", callbackUpdate);
           }
 
+          callbackUpdate();
+
           // We need to use an arrow function here, otherwise "this"
           // would be undefined inside the function
           this.timer = setInterval(() => {
@@ -206,8 +208,6 @@
             document.getElementById("player2"),
             this.update,
           );
-
-          this.update();
         }
 
         static body_onkeydown(event) {
