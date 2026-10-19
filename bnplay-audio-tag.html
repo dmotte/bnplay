@@ -156,6 +156,17 @@
             return Promise.resolve();
           } else return this.play();
         }
+
+        ////////////////////////////////////////////////////////////////////////
+
+        static getVolume() {
+          return this.player1.volume;
+        }
+
+        static setVolume(value) {
+          this.player1.volume = value;
+          this.player2.volume = value;
+        }
       }
 
       class App {
@@ -211,12 +222,26 @@
         }
 
         static body_onkeydown(event) {
-          const btnToggle = document.getElementById("btnToggle"),
-            dialogMsg = document.getElementById("dialogMsg");
+          const dialogMsg = document.getElementById("dialogMsg");
 
           if (dialogMsg.open) return;
 
-          if (event.key === " ") btnToggle.click();
+          const btnToggle = document.getElementById("btnToggle"),
+            rangeVolume = document.getElementById("rangeVolume");
+
+          switch (event.key) {
+            case " ":
+              btnToggle.click();
+              break;
+            case "ArrowUp":
+              rangeVolume.value = BNP.getVolume() + 0.05;
+              rangeVolume.dispatchEvent(new Event("input", { bubbles: true }));
+              break;
+            case "ArrowDown":
+              rangeVolume.value = BNP.getVolume() - 0.05;
+              rangeVolume.dispatchEvent(new Event("input", { bubbles: true }));
+              break;
+          }
         }
 
         static btnToggle_onclick() {
@@ -227,6 +252,17 @@
 
             this.showModalMsg();
           })();
+        }
+
+        static rangeVolume_oninput() {
+          const rangeVolume = document.getElementById("rangeVolume"),
+            spanVolPercent = document.getElementById("spanVolPercent");
+
+          const value = parseFloat(rangeVolume.value);
+
+          BNP.setVolume(value);
+
+          spanVolPercent.textContent = Math.floor(value * 100);
         }
       }
 
@@ -261,6 +297,23 @@
           onfocus="this.blur()"
           onclick="App.btnToggle_onclick()"
         />
+      </p>
+
+      <p>
+        <input
+          type="range"
+          id="rangeVolume"
+          step="0.05"
+          min="0"
+          max="1"
+          value="1"
+          style="width: 150px"
+          oninput="App.rangeVolume_oninput()"
+        />
+        <br />
+        <span class="text-minor">
+          Volume <span id="spanVolPercent">100</span> %
+        </span>
       </p>
     </div>
 
