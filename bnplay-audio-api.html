@@ -58,9 +58,10 @@
     <script type="module">
       /** Brown Noise Player */
       class BNP {
-        static audioCtx = new AudioContext();
         static audioData;
-        static source = null;
+
+        static audioCtx = new AudioContext();
+        static nodeSource = null;
 
         static async getSampleFromWeb() {
           const response = await fetch(
@@ -128,24 +129,24 @@
         }
 
         static isPlaying() {
-          return this.source !== null;
+          return this.nodeSource !== null;
         }
 
         static play() {
           if (this.isPlaying()) return;
 
-          this.source = new AudioBufferSourceNode(this.audioCtx);
-          this.source.buffer = this.audioData;
-          this.source.connect(this.audioCtx.destination);
-          this.source.loop = true;
-          this.source.start(0);
+          this.nodeSource = new AudioBufferSourceNode(this.audioCtx);
+          this.nodeSource.buffer = this.audioData;
+          this.nodeSource.connect(this.audioCtx.destination);
+          this.nodeSource.loop = true;
+          this.nodeSource.start();
         }
 
         static stop() {
           if (!this.isPlaying()) return;
 
-          this.source.stop();
-          this.source = null;
+          this.nodeSource.stop();
+          this.nodeSource = null;
         }
 
         static toggle() {
