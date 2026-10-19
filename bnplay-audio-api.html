@@ -171,16 +171,16 @@
 
         static update() {
           const btnToggle = document.getElementById("btnToggle"),
-            divStatus = document.getElementById("divStatus");
+            spanStatus = document.getElementById("spanStatus");
 
           if (BNP.isPlaying()) {
-            divStatus.textContent = "Playing...";
+            spanStatus.textContent = "Playing...";
             document.title = "BNPlay - Playing";
             btnToggle.value = "\u23F9  STOP";
             if (navigator.mediaSession)
               navigator.mediaSession.playbackState = "playing";
           } else {
-            divStatus.textContent = "Stopped.";
+            spanStatus.textContent = "Stopped.";
             document.title = "BNPlay - Stopped";
             btnToggle.value = "\u25B6  PLAY";
             if (navigator.mediaSession)
@@ -282,16 +282,20 @@
       <h1>&#x1F50A; BNPlay</h1>
 
       <p>&#x1F3A7; <i>Audio API version</i></p>
-      <br />
-      <div id="divStatus" class="text-minor"></div>
-      <br />
-      <input
-        type="button"
-        id="btnToggle"
-        class="btn-ctrl"
-        onfocus="this.blur()"
-        onclick="App.btnToggle_onclick()"
-      />
+
+      <p style="margin: 30px 0 30px 0">
+        <span id="spanStatus" class="text-minor"></span>
+      </p>
+
+      <p>
+        <input
+          type="button"
+          id="btnToggle"
+          class="btn-ctrl"
+          onfocus="this.blur()"
+          onclick="App.btnToggle_onclick()"
+        />
+      </p>
     </div>
 
     <dialog id="dialogMsg" closedby="none"></dialog>
